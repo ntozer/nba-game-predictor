@@ -8,8 +8,11 @@ import os
 seasons = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
 months = ['octboer', 'november', 'december', 'january', 'february', 'march', 'april', 'june']
 for season in seasons:
-    for month in months:
     
+    print('Processing data from the {s1}-{s2} NBA season'.format(s1=(season-1), s2=season))
+    
+    for month in months:
+        
         # data extraction
         url = 'https://www.basketball-reference.com/leagues/NBA_{year}_games-{month}.html'
         scrape_url = url.format(year=season, month=month)
@@ -59,6 +62,8 @@ for season in seasons:
                     elif row_data[j-9:j] == 'Box Score':
                         row_data = row_data[:j] + ',0' + row_data[j:]
                 
+                if row_data[-1].isdigit():
+                    row_data = row_data + ','
                 row_results_cleansed.append(row_data.split(','))
         
         
@@ -71,5 +76,5 @@ for season in seasons:
         file_name = dir_path + '/' + scrape_url[54:-5] + '.csv'
         with open(file_name, 'w') as file:
             writer = csv.writer(file)
-            writer.writerow(['Date', 'Visitor', 'Visitor_PTS','Home', 'Home_PTS', 'Box Score', '#OTs', 'Attend.'])
+            writer.writerow(['Date', 'Visitor', 'Visitor_PTS','Home', 'Home_PTS', 'Box Score', '#OTs', 'Attend.', 'Notes'])
             writer.writerows(row_results_cleansed)
