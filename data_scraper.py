@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 seasons = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
-months = ['octboer', 'november', 'december', 'january', 'february', 'march', 'april', 'june']
+months = ['october', 'november', 'december', 'january', 'february', 'march', 'april', 'june']
 for season in seasons:
     
     print('Processing data from the {s1}-{s2} NBA season'.format(s1=(season-1), s2=season))
