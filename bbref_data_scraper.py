@@ -4,11 +4,17 @@ from bs4 import BeautifulSoup
 import csv
 from pathlib import Path
 import os
+import sys
 
-seasons = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
-months = ['october', 'november', 'december', 'january', 'february', 'march', 'april', 'june']
-for season in seasons:
-    
+print('Running ', sys.argv[0])
+
+months = sys.argv[2].strip('[]').split(',')
+seasons = list(map(int, sys.argv[1].strip('[]').split(',')))
+
+#hardcoded inputs for testing
+#seasons = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
+#months = ['october', 'november', 'december', 'january', 'february', 'march', 'april', 'june']
+for season in seasons: 
     print('Processing data from the {s1}-{s2} NBA season'.format(s1=(season-1), s2=season))
     
     for month in months:
