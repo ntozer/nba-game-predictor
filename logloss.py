@@ -1,4 +1,5 @@
 from math import log
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPClassifier
 
@@ -76,4 +77,26 @@ def minimize_logloss(X_train, y_train, X_cval, y_cval, max_layers=4, max_percept
 
     return (min_logloss, hidden_layers, perceptrons, logloss_list, layers_list, perceptrons_list)
                 
-            
+def compute_stats(p_list, y_list):
+    p = np.round_(p_list, 0)
+    y = np.asarray(y_list)
+    
+    tp=0
+    fn=0
+    fp=0
+    tn=0
+    for i in range(len(y)):
+        if p[i]==1 and y[i]==1:
+            tp += 1
+        elif p[i]==0 and y[i]==1:
+            fn += 1
+        elif p[i]==1 and y[i]==0:
+            fp += 1
+        elif p[i]==0 and y[i]==0:
+            tn += 1
+    precision = tp / (tp + fp) 
+    recall = tp / (tp + tn)
+    accuracy = (tp + tn)/(tp + fp + tn + fn)
+    F1_score = 2 * (precision * recall)/(precision + recall)
+    
+    return (F1_score, precision, recall, accuracy)

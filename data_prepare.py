@@ -11,7 +11,7 @@ months = sys.argv[2].strip('[]').split(',')
 for season in seasons:
     df = None
     
-    print('Loading data for the {s1}-{s2} NBA season'.format(s1=(season-1), s2=season))
+    print('Processing data for the {s1}-{s2} NBA season'.format(s1=(season-1), s2=season))
     
     for month in months:
         try:
