@@ -22,31 +22,7 @@ def compute_logloss(p, y):
     return logloss
 
 
-def create_logloss_subplot(p, y):
-    """
-    graphs the log loss over the iterations of prediction/label pairs
-    N = number of data predictions to test
-    p = list of predictions to test
-    y = list of labels associated with the given predictions
-    """
-    logloss_list = []
-    N = len(p)
-    try:
-        for i in range(N):
-            logloss_list.append(compute_logloss(p[:i], y[:i]))
-    except IndexError:
-        print('ERROR: Labels and Predictions are not both of the length N')
-        return
-    
-    fig = plt.figure()
-    fig.add_axes()
-    ax = fig.add_subplot(111)
-    ax.plot(range(len(logloss_list)), logloss_list)
-    
-    return ax
-
-
-def minimize_logloss(X_train, y_train, X_cval, y_cval, max_layers=4, max_perceptrons=50, min_layers=1, min_perceptrons=5, perceptron_func='logistic'):
+def minimize_logloss(X_train, y_train, X_cval, y_cval, max_layers=4, max_perceptrons=50, min_layers=1, min_perceptrons=10, increment=1, perceptron_func='logistic'):
     min_logloss = 1
     hidden_layers = 0
     perceptrons = 0
@@ -55,7 +31,7 @@ def minimize_logloss(X_train, y_train, X_cval, y_cval, max_layers=4, max_percept
     perceptrons_list = []
     
     for i in range(min_layers, max_layers+1, 1):
-        for j in range(min_perceptrons, max_perceptrons+1, 1):
+        for j in range(min_perceptrons, max_perceptrons+1, increment):
             #setting up and training NN
             clf = MLPClassifier(solver='lbfgs', activation=perceptron_func, alpha=1e-5, hidden_layer_sizes=(j, i), random_state=1)
             clf.fit(X_train, y_train)

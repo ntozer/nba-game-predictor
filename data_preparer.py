@@ -1,31 +1,5 @@
 import pandas as pd
-
-def load_data(seasons, months=['october', 'november', 'december', 'january', 'february', 'march', 'april', 'may', 'june']):
-    """
-    Params:
-        seasons - the seasons to load data from
-        months - the months to load data from
-    Returns:
-        df_list - list containing a dataframe for each season loaded
-    """
-    df_list = []
-    for season in seasons:
-        print('Loading raw data from /data/raw/NBA_{s}/'.format(s=season))
-        df = None
-        for month in months:
-            try:
-                temp_df = pd.read_csv('data/raw/NBA_{s}/games-{m}.csv'.format(s=season, m=month))
-                if df is None:
-                    df = temp_df
-                else:
-                    df = df.append(temp_df, ignore_index=True)
-            except FileNotFoundError:
-                print('No data for month of', month)
-                continue
-                
-        df_list.append(df)
-    
-    return df_list
+from data_handler import load_raw_data
 
 
 def clean_data(df_list):
@@ -82,8 +56,6 @@ def init_features(df):
     df['Visitor_AvgPTS'] = 0
     df['Visitor_GamesPlayed'] = 0
     df['Visitor_DaysPast'] = 0
-    df['Home_ELO'] = 1500
-    df['Visitor_ELO'] = 1500
     return df
 
 
@@ -93,7 +65,8 @@ def create_features(df_list, seasons=None):
         df_list - list of dataframes to add game by game features to
     """
     for i in range(len(df_list)):
-        df = init_features(df_list[i])
+        df = init_ELO(df_list, i)
+        df = init_features(df)
         
         if seasons is not None:
             print('Creating features for the {} NBA season'.format(seasons[i]))
@@ -182,6 +155,43 @@ def create_streak(df, idx, game_type, prev_idx, prev_game_type):
     return df
 
 
+def init_ELO(df_list, idx):
+    
+    def soft_reset_ELO(prev_ELO):
+        new_ELO = prev_ELO * 0.75 + (1505 * 0.25)
+        return new_ELO
+        
+    df = df_list[idx]
+    if idx == 0:
+        df['Home_ELO'] = 1300
+        df['Visitor_ELO'] = 1300
+    else:
+        df['Home_ELO'] = 1500
+        df['Visitor_ELO'] = 1500
+        prev_df = df_list[idx-1]
+        i = 0
+        teams = 0
+        while teams < df['Home'].value_counts().size :
+            #print(teams)
+            home = df.loc[i, 'Home']
+            vis = df.loc[i, 'Visitor']
+            
+            if not has_prev_game(df[:i], home):
+                if has_prev_game(prev_df, home):
+                    prev_idx, game_type, y, z = find_prev_game(prev_df, home)
+                    df.loc[i, 'Home_ELO'] = soft_reset_ELO(prev_df.loc[prev_idx, game_type + '_ELO'])
+                teams += 1
+
+            if not has_prev_game(df[:i], vis):
+                if has_prev_game(prev_df, vis):
+                    prev_idx, game_type, y, z = find_prev_game(prev_df, vis)
+                    df.loc[i, 'Visitor_ELO'] = soft_reset_ELO(prev_df.loc[prev_idx, game_type + '_ELO'])
+                teams += 1
+            
+            i += 1
+
+    return df
+
 def create_ELO(df, idx, game_type, prev_idx, prev_game_type):
     winner = df.loc[prev_idx, 'Winner']
     won = False
@@ -209,7 +219,7 @@ def compute_ELO(team_ELO, opp_ELO, game_type, won, spread):
     Implementation of Nate Silver's ELO formula
     """
     elo_diff = team_ELO - opp_ELO
-    
+    #accounting for homecourt advantage by reducing spread by 3 PTS
     if not won:
         S = 0
         elo_diff *= -1
@@ -229,7 +239,7 @@ def compute_ELO(team_ELO, opp_ELO, game_type, won, spread):
     #computing new elo
     updated_ELO = K * (S - E) + team_ELO
     
-    return int(updated_ELO)
+    return updated_ELO
 
 def won_game(df, idx, game_type):
     """
@@ -326,8 +336,8 @@ def write_prepared_data(df_list, seasons):
         df_list[i].to_csv('data/prep/{s}_NBAseason.csv'.format(s=seasons[i]))
 
 
-seasons = [2008]
-seasons_list = load_data(seasons)
+seasons = list(range(2001, 2018))
+seasons_list = load_raw_data(seasons)
 seasons_list = clean_data(seasons_list)
 seasons_list = create_features(seasons_list, seasons)
 write_prepared_data(seasons_list, seasons)
