@@ -5,10 +5,10 @@ and machine learning spawned the idea of making an NBA Game Predictor.
 
 ## Project Screenshots
 ELO values for home and visiting teams vs. the outcome of the game in the 2016-2017 NBA season
-![elo_viz](https://github.com/ntozer/images/blob/master/nba%20game%20predictor/2017%20elo%20screen.PNG?raw=true)
+![elo_viz](https://imgur.com/Z4XcGy6)
 
 Change of logloss vs. the number of data points(predictions made using a 2 layer 46 node neural network on the test set)
-![logloss_test_viz](https://github.com/ntozer/images/blob/master/nba%20game%20predictor/testset%20logloss%20nn%202_26.png?raw=true)
+![logloss_test_viz](https://imgur.com/ZIaiBvW)
 
 
 
@@ -39,5 +39,5 @@ Still have to update this :)
 I'll update this when I'm done :)
 
 ## Technologies Used
-![tech_used](https://github.com/ntozer/images/blob/master/nba%20game%20predictor/nba%20game%20predictor%20tech.PNG?raw=true)
+![tech_used](https://imgur.com/eGUeX2d)
 
