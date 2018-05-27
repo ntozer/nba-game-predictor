@@ -2,6 +2,14 @@ import pandas as pd
 from data_handler import load_raw_data
 
 
+def main():
+    seasons = list(range(2001, 2018))
+    seasons_list = load_raw_data(seasons)
+    seasons_list = clean_data(seasons_list)
+    seasons_list = create_features(seasons_list, seasons)
+    write_prepared_data(seasons_list, seasons)
+
+
 def clean_data(df_list):
     """
     Params:
@@ -336,8 +344,5 @@ def write_prepared_data(df_list, seasons):
         df_list[i].to_csv('data/prep/{s}_NBAseason.csv'.format(s=seasons[i]))
 
 
-seasons = list(range(2001, 2018))
-seasons_list = load_raw_data(seasons)
-seasons_list = clean_data(seasons_list)
-seasons_list = create_features(seasons_list, seasons)
-write_prepared_data(seasons_list, seasons)
+if __name__ == "__main__":
+    main()

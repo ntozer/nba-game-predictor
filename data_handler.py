@@ -68,3 +68,26 @@ def seperate_dataset(df):
     test = test_cval[~msk]
     
     return(train, cval, test)
+    
+
+def load_feature_data(season, team, feature):
+    """
+    Params: 
+        season - the season that the data new feature df is to be created from
+        team - the team the feature data will be associated with
+        feature - the feature to that new df will be based upon
+    Returns:
+        feature_df - a new dataframe with columns, date and feature associated with a team, season combination
+    """
+    cols = ['Date', 'Home', 'Visitor']
+    cols.append('Home_{}'.format(feature))
+    cols.append('Visitor_{}'.format(feature))
+    
+    df = load_prep_data([season])[cols]
+    df.loc[df['Home'] == team, feature] = df.loc[df['Home'] == team, cols[3]]
+    df.loc[df['Visitor'] == team, feature] = df.loc[df['Visitor'] == team, cols[4]]
+    df = df.dropna().reset_index(drop=True)
+    df = df[['Date', feature]]
+    
+    return df
+    
